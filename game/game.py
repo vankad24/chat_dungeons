@@ -3,6 +3,7 @@ from enum import Enum
 from attrs import define, field
 from telebot.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
+from game.display_handler import create_game_image
 from main import send_photo, edit_photo, edit_photos_text
 from models.base import BaseStage, BaseCharacter, BaseEnemy
 from models.characters.Viren import Viren
@@ -40,8 +41,8 @@ class GameState:
     def clear_message(self):
         self.reply_message = ''
 
-    def get_image(self):
-        ...
+    def get_image_path(self):
+        return create_game_image(self.stage, self.character, self.enemy)
 
     def get_markup(self):
         keyboard = InlineKeyboardMarkup()
@@ -86,7 +87,7 @@ def start_game(state: GameState):
     state.enemy = Skeleton()
     state.stage = Forest()
     state.character = Viren()
-    msg = send_photo(state.user_id, state.get_image(), "Вирен шёл по прекрасной поляне, как вдруг встретил скелета", state.get_markup())
+    msg = send_photo(state.user_id, state.get_image_path(), "Вирен шёл по прекрасной поляне, как вдруг встретил скелета", state.get_markup())
     state.current_msg_id = msg.message_id
     state.clear_message()
 
@@ -104,7 +105,7 @@ def handle_callback(call: CallbackQuery, state: GameState):
 def update_game_message(state):
 
     edit_photos_text(state.user_id, state.current_msg_id, "Загрузка...")
-    edit_photo(state.user_id, state.get_image(), state.current_msg_id, state.reply_message, state.get_markup())
+    edit_photo(state.user_id, state.get_image_path(), state.current_msg_id, state.reply_message, state.get_markup())
 
     state.clear_message()
 
