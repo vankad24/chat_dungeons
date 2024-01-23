@@ -26,10 +26,14 @@ def test_command(message):
 @bot.message_handler(commands=['img'])
 def send_image(message):
     # {'file_id': 'AgACAgIAAxkDAAIBomWe0FtuYFG1uKo2CsJWXxXvKPEeAALc0zEbzVX4SBVvFIxVNp4cAQADAgADcwADNAQ', 'file_unique_id': 'AQAD3NMxG81V-Eh4', 'width': 72, 'height': 90, 'file_size': 1591}
-    msg = send_photo(message.chat.id, 'temp/poster.png', 'hello there what do you think of Marinette dupeng chang and miraculous ladybug?')
-    photo = msg.photo[0]
-    print(photo)
-    print(msg.message_id)
+    import time
+    start_time = time.perf_counter()
+    msg = send_photo(message.chat.id, 'temp/1706029962614.png', 'Dungeons?')
+    end_time = time.perf_counter()
+    print('Прошло ', end_time - start_time)
+    # photo = msg.photo[0]
+    # print(photo)
+    # print(msg.message_id)
 
 
 @bot.callback_query_handler(func=lambda call: True)

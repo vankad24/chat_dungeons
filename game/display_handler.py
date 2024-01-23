@@ -27,7 +27,8 @@ def draw_health_bar(drawable: ImageDraw, center_x, y, current_hp, max_hp):
     y2 = y1+bar_height
     center_x-= bar_width // 2
     drawable.rectangle([center_x, y1 - outline_width, center_x + bar_width, y2 + outline_width], fill=background_color, outline=outline_color, width=outline_width)
-    drawable.rectangle([center_x + outline_width, y1, center_x + bar_width * hp_percent - outline_width, y2], fill=fill_color)
+    if current_hp > 0:
+        drawable.rectangle([center_x + outline_width, y1, center_x + bar_width * hp_percent - outline_width, y2], fill=fill_color)
     drawable.text((center_x + bar_width + hp_margin, y1), str(current_hp), font=font, fill=fill_color, align="left", stroke_fill=outline_color, stroke_width=outline_width)
 
 

@@ -9,4 +9,4 @@ def listener(messages):
 
 print("Bot is running...")
 # bot.set_update_listener(listener)
-bot.infinity_polling()
+bot.infinity_polling(timeout=123)

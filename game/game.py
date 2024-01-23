@@ -26,14 +26,14 @@ class CallbackAction:
 
 @define
 class GameState:
-    user_id: int
+    user_id: int = field(init=True)
     current_msg_id: int = field(init=False)
     stage: BaseStage = field(init=False)
     character: BaseCharacter = field(init=False)
     enemy: BaseEnemy = field(init=False)
-    current_phase = Phase.WELCOME
-    is_running: bool = False
-    reply_message: str = ''
+    current_phase = field(init=False, default=Phase.WELCOME)
+    is_running: bool = field(init=False, default=False)
+    reply_message: str = field(init=False)
 
     def add_message(self, msg):
         self.reply_message+=msg+'\n'
@@ -76,7 +76,7 @@ class GameState:
 
 def get_game_state(user_id):
     if user_id in game_states:
-        return game_states
+        return game_states[user_id]
     state = GameState(user_id)
     game_states[user_id] = state
     return state
