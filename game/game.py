@@ -7,7 +7,7 @@ from main import send_photo, edit_photo, edit_photos_text
 from models.base import BaseStage, BaseCharacter, BaseEnemy
 from models.characters.Viren import Viren
 from models.enemies.Skeleton import Skeleton
-from models.stages.Forest import PeacefulStage
+from models.stages.Forest import Forest
 
 from random import randint
 
@@ -84,7 +84,7 @@ def start_game(state: GameState):
     state.is_running = True
     state.current_phase = Phase.WELCOME
     state.enemy = Skeleton()
-    state.stage = PeacefulStage()
+    state.stage = Forest()
     state.character = Viren()
     msg = send_photo(state.user_id, state.get_image(), "Вирен шёл по прекрасной поляне, как вдруг встретил скелета", state.get_markup())
     state.current_msg_id = msg.message_id

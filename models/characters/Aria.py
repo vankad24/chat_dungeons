@@ -5,5 +5,8 @@ from models.base import BaseCharacter
 @define
 class Aria(BaseCharacter):
     texture_filename: str = 'aria.png'
-    health = 40
-    damage = 5
+    x_origin: int = 130
+    max_health = 40
+    damage: int = 5
+    armor: int = 0
+    resistance: int = 4
