@@ -1,6 +1,6 @@
 import requests
 import telebot
-from telebot.types import InputFile, InputMediaPhoto
+from telebot.types import InputFile, InputMediaPhoto, CallbackQuery
 
 import os
 from dotenv import load_dotenv
@@ -25,7 +25,7 @@ def edit_photos_text(chat_id, msg_id, msg_text=None, markup=None):
 
 @bot.message_handler(commands=['help', 'start'])
 def send_welcome(message):
-    bot.reply_to(message, "Добро пожаловать в подземелья! Введите /play, чтобы начать игру")
+    bot.reply_to(message, "Добро пожаловать в подземелья! Введите /play, чтобы начать игру\n\nВнимание: это демо версия")
 
 @bot.message_handler(commands=['play'])
 def play_command(message):
@@ -37,9 +37,12 @@ def play_command(message):
         start_game(state)
 
 @bot.callback_query_handler(func=lambda call: True)
-def handle_button_click(call):
+def handle_button_click(call: CallbackQuery):
     state = get_game_state(call.message.chat.id)
-    handle_callback(call, state)
+    if not state.is_running:
+        bot.send_message(call.message.chat.id, "Попробуйте запустить новую игру с помощью /play")
+    else:
+        handle_callback(call, state)
 
 
 @bot.message_handler(commands=['test'])
