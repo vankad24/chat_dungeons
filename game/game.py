@@ -35,7 +35,7 @@ class GameState:
     enemy: BaseEnemy = field(init=False)
     current_phase = field(init=False, default=Phase.WELCOME)
     is_running: bool = field(init=False, default=False)
-    reply_message: str = field(init=False)
+    reply_message: str = field(init=False, default='')
 
     def add_message(self, msg):
         self.reply_message+=msg+'\n'
@@ -80,6 +80,7 @@ class GameState:
 
 
 def get_game_state(user_id):
+    # todo add game id
     if user_id in game_states:
         return game_states[user_id]
     state = GameState(user_id)

@@ -18,6 +18,14 @@ def play_command(message):
     else:
         start_game(state)
 
+@bot.message_handler(commands=['stop'])
+def play_command(message):
+    chat_id = message.chat.id
+    state = get_game_state(chat_id)
+    if state.is_running:
+        state.is_running = False
+        bot.send_message(chat_id, "Игра остановлена")
+
 @bot.message_handler(commands=['test'])
 def test_command(message):
     bot.send_message(message.chat.id, "Hi there!")
