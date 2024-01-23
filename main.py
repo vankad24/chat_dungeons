@@ -1,71 +1,64 @@
 import requests
 import telebot
-from telebot import types
-# pip install pyTelegramBotAPI
-from telebot.types import InputFile
-import time
+from telebot.types import InputFile, InputMediaPhoto
+
 import os
 from dotenv import load_dotenv
+
+from game.game import get_game_state, start_game, handle_callback
+
 load_dotenv()
 
 API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')
+# duncard, lostcard
 
 bot = telebot.TeleBot(API_TOKEN)
 
+def send_photo(chat_id, image_path, msg_text=None, markup=None):
+    return bot.send_photo(chat_id, InputFile(image_path), msg_text, reply_markup=markup)
+    # return bot.send_media_group(chat_id, [InputMediaPhoto(image_path, caption=text)])[0]
+def edit_photo(chat_id, image_path, msg_id, msg_text=None, markup=None):
+    return bot.edit_message_media(InputMediaPhoto(InputFile(image_path), caption=msg_text), chat_id, msg_id, reply_markup=markup)
+
+def edit_photos_text(chat_id, msg_id, msg_text=None, markup=None):
+    return bot.edit_message_caption(msg_text, chat_id, msg_id, reply_markup=markup)
 
 @bot.message_handler(commands=['help', 'start'])
 def send_welcome(message):
-    bot.reply_to(message, "Добро пожаловать в подземелья!")
+    bot.reply_to(message, "Добро пожаловать в подземелья! Введите /play, чтобы начать игру")
 
 @bot.message_handler(commands=['play'])
 def play_command(message):
-    ...
+    chat_id = message.chat.id
+    state = get_game_state(chat_id)
+    if state.is_running:
+        bot.send_message(chat_id, "Игра уже идёт")
+    else:
+        start_game(state)
+
+@bot.callback_query_handler(func=lambda call: True)
+def handle_button_click(call):
+    state = get_game_state(call.message.chat.id)
+    handle_callback(call, state)
+
 
 @bot.message_handler(commands=['test'])
 def test_command(message):
-    time.sleep(3)
     bot.send_message(message.chat.id, "Hi there!")
 
-@bot.message_handler(commands=['message'])
-def send_message_with_keyboard(message):
-    # Создаем клавиатуру с кнопками
-    keyboard = types.InlineKeyboardMarkup(row_width=3)
-    repeat_button = types.InlineKeyboardButton("Повторить", callback_data='repeat')
-    ok_button = types.InlineKeyboardButton("Нет", callback_data='no')
-    keyboard.add(repeat_button, row_width=2)
-    keyboard.add(ok_button, row_width=1)
-
-
-    # Отправляем сообщение с кнопками
-    bot.send_message(message.chat.id, "Привет! ", reply_markup=keyboard)
-
-
-# func - filter function. Call Obfect fields https://pytba.readthedocs.io/en/latest/types.html#telebot.types.CallbackQuery
-@bot.callback_query_handler(func=lambda call: True)
-def handle_button_click(call):
-    if call.data == 'repeat':
-        # Отправляем сообщение повторно
-        # bot.send_message(call.message.chat.id, "Привет!", reply_markup=call.message.reply_markup)
-        send_message_with_keyboard(call.message)
-    elif call.data == 'no':
-        message = call.message
-        # Меняем сообщение
-        bot.edit_message_text('Я тебя прекрасно понимаю, брат!', message.chat.id, message.message_id)
-        # Меняем кнопки. Добавляем ссылку на легендарную песню
-        keyboard = types.InlineKeyboardMarkup()
-        link_button = types.InlineKeyboardButton("Для успокоения", url="https://youtu.be/dQw4w9WgXcQ")
-        keyboard.add(link_button)
-        bot.edit_message_reply_markup(message.chat.id, message.message_id, reply_markup=keyboard)
 
 @bot.message_handler(commands=['img'])
 def send_image(message):
-    # msg = bot.send_photo(message.chat.id, InputFile('tests/poster.png'))
     # {'file_id': 'AgACAgIAAxkDAAIBomWe0FtuYFG1uKo2CsJWXxXvKPEeAALc0zEbzVX4SBVvFIxVNp4cAQADAgADcwADNAQ', 'file_unique_id': 'AQAD3NMxG81V-Eh4', 'width': 72, 'height': 90, 'file_size': 1591}
-    msg = bot.send_photo(message.chat.id, "AgACAgIAAxkDAAIBomWe0FtuYFG1uKo2CsJWXxXvKPEeAALc0zEbzVX4SBVvFIxVNp4cAQADAgADcwADNAQ")
+    msg = send_photo(message.chat.id, 'temp/poster.png', 'hello there what do you think of Marinette dupeng chang and miraculous ladybug?')
     photo = msg.photo[0]
     print(photo)
-    print(photo.file_id)
+    print(msg.message_id)
 
+def listener(messages):
+    for m in messages:
+        print(str(m))
 
 print("Bot is running...")
+# bot.set_update_listener(listener)
 bot.infinity_polling()
