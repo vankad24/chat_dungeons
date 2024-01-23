@@ -5,6 +5,7 @@ from telebot.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
 
 from game.display_handler import create_game_image
 from bot.functions import send_photo, edit_photo, edit_photos_text
+from bot import bot
 from models.base import BaseStage, BaseCharacter, BaseEnemy
 from models.characters.Viren import Viren
 from models.enemies.Skeleton import Skeleton
@@ -23,6 +24,7 @@ class Phase(Enum):
 class CallbackAction:
     NEXT = 'next'
     ATTACK = 'attack'
+    FINISH = 'finish'
 
 @define
 class GameState:
@@ -46,14 +48,18 @@ class GameState:
 
     def get_markup(self):
         keyboard = InlineKeyboardMarkup()
-        if self.current_phase == Phase.WELCOME:
-            button = InlineKeyboardButton("Продолжить", callback_data=CallbackAction.NEXT)
-            keyboard.row(button)
-        elif self.current_phase == Phase.CHOSE_ACTION:
-            button = InlineKeyboardButton("Атаковать", callback_data=CallbackAction.ATTACK)
-            keyboard.row(button)
-        else:
-            keyboard = None
+        match self.current_phase:
+            case Phase.WELCOME:
+                button = InlineKeyboardButton("Продолжить", callback_data=CallbackAction.NEXT)
+                keyboard.row(button)
+            case Phase.CHOSE_ACTION:
+                button = InlineKeyboardButton("Атаковать", callback_data=CallbackAction.ATTACK)
+                keyboard.row(button)
+            case Phase.END:
+                button = InlineKeyboardButton("Продолжить", callback_data=CallbackAction.FINISH)
+                keyboard.row(button)
+            case _:
+                keyboard = None
         return keyboard
 
     def battle(self):
@@ -67,11 +73,10 @@ class GameState:
 
             if not c.is_alive():
                 self.add_message(f"Вы не выдержали такого удара")
-                self.is_running = False
 
         else:
             self.add_message(f"Враг был повержен столь сокрушающей силой")
-            self.is_running = False
+
 
 
 def get_game_state(user_id):
@@ -87,7 +92,9 @@ def start_game(state: GameState):
     state.enemy = Skeleton()
     state.stage = Forest()
     state.character = Viren()
-    msg = send_photo(state.user_id, state.get_image_path(), "Вирен шёл по прекрасной поляне, как вдруг встретил скелета", state.get_markup())
+    load_msg = bot.send_message(state.user_id, "Загрузка...")
+    msg = send_photo(state.user_id, state.stage.assets_folder+"/"+state.stage.texture_filename, "Вирен шёл по прекрасной поляне, как вдруг встретил скелета", state.get_markup())
+    bot.delete_message(state.user_id, load_msg.message_id)
     state.current_msg_id = msg.message_id
     state.clear_message()
 
@@ -100,12 +107,19 @@ def handle_callback(call: CallbackQuery, state: GameState):
                 state.add_message("Что ж, надирём им задницу!")
         case CallbackAction.ATTACK:
             state.battle()
+            if not state.enemy.is_alive() or not state.character.is_alive():
+                state.current_phase = Phase.END
+        case CallbackAction.FINISH:
+            state.is_running = False
+            edit_photo(state.user_id, state.stage.assets_folder+"/"+state.stage.texture_filename, state.current_msg_id, "Вирен смачно ушёл в закат...")
+            return
 
     update_game_message(state)
 
 def update_game_message(state):
 
     edit_photos_text(state.user_id, state.current_msg_id, "Загрузка...")
+
     edit_photo(state.user_id, state.get_image_path(), state.current_msg_id, state.reply_message, state.get_markup())
 
     state.clear_message()
