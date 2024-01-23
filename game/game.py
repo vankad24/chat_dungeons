@@ -97,6 +97,7 @@ def handle_callback(call: CallbackQuery, state: GameState):
         case CallbackAction.NEXT:
             if state.current_phase == Phase.WELCOME:
                 state.current_phase = Phase.CHOSE_ACTION
+                state.add_message("Что ж, надирём им задницу!")
         case CallbackAction.ATTACK:
             state.battle()
 
