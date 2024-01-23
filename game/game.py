@@ -4,7 +4,7 @@ from attrs import define, field
 from telebot.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from game.display_handler import create_game_image
-from main import send_photo, edit_photo, edit_photos_text
+from bot.functions import send_photo, edit_photo, edit_photos_text
 from models.base import BaseStage, BaseCharacter, BaseEnemy
 from models.characters.Viren import Viren
 from models.enemies.Skeleton import Skeleton
