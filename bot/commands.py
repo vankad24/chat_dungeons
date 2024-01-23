@@ -1,7 +1,7 @@
 from telebot.types import CallbackQuery
 
+from bot import bot
 from bot.functions import send_photo
-from main import bot
 from game.game import get_game_state, start_game, handle_callback
 
 

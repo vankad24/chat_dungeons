@@ -1,13 +1,4 @@
-import telebot
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-API_TOKEN = os.getenv('TELEGRAM_API_TOKEN')
-# duncard, lostcard
-
-bot = telebot.TeleBot(API_TOKEN)
+from bot import bot
 
 # import bot commands handlers
 from bot.commands import *

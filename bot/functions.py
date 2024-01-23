@@ -1,5 +1,5 @@
 from telebot.types import InputFile, InputMediaPhoto
-from main import bot
+from bot import bot
 def send_photo(chat_id, image_path, msg_text=None, markup=None):
     return bot.send_photo(chat_id, InputFile(image_path), msg_text, reply_markup=markup)
     # return bot.send_media_group(chat_id, [InputMediaPhoto(image_path, caption=text)])[0]
