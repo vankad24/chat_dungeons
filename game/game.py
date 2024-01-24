@@ -8,6 +8,7 @@ from bot.functions import send_photo, edit_photo, edit_photos_text
 from bot import bot
 from models.base import BaseStage, BaseCharacter, BaseEnemy
 from models.characters.Viren import Viren
+from models.characters.Aria import Aria
 from models.enemies.Skeleton import Skeleton
 from models.stages.Forest import Forest
 

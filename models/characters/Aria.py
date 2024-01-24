@@ -6,7 +6,7 @@ from models.base import BaseCharacter
 class Aria(BaseCharacter):
     texture_filename: str = 'aria.png'
     x_origin: int = 130
-    max_health = 40
+    max_health: int = 40
     damage: int = 5
     armor: int = 0
     resistance: int = 4
